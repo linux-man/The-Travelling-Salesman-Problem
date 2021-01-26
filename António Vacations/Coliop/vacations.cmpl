@@ -1,0 +1,73 @@
+%display nonZeros
+
+%data
+
+parameters:
+
+variables:
+travel[travels, cities, cities]: binary;
+u[cities]: real[0..];
+
+objectives:
+distance: sum{k in travels, i in cities, j in cities: dist[i, j] * travel[k, i, j]} -> min;
+
+constraints:
+travel_duration { k in travels:
+    sum{i in cities, j in cities: travel[k, i, j] * visit_duration[j]} <= maxDuration;
+}
+
+diferent_city {
+    k in travels, i in cities:  travel[k, i, i] = 0;
+}
+
+start_from {
+    k in travels: sum{j in cities: travel[k, 1, j]} = 1;
+}
+
+end_at {
+    k in travels: sum{i in cities: travel[k, i, 1]} = 1;
+}
+
+continue_travel {
+    k in travels, i in cities:
+    sum{j in cities: travel[k, i, j] - travel[k, j, i]} = 0;
+}
+
+dont_turn_back {
+    k in travels, i in cities, j in cities:
+    travel[k, i, j] + travel[k, j, i] <= 1;
+}
+
+limit_i {
+    j in cities, j > 1:  sum{k in travels, i in cities: travel[k, i, j]} = 1;
+}
+
+limit_j {
+    i in cities, i > 1:  sum{k in travels, j in cities: travel[k, i, j]} = 1;
+}
+
+no_closed_circuits {
+    k in travels, i in cities, j in cities, i > 1, j > 1, i<>j: u[i] - u[j] + numCities * travel[k, i, j] <= numCities - 1;
+}
+
+/*
+Cities Codes
+Frankfurt   1
+Amesterdam  2
+Athens      3
+Berlin      4
+Bern        5
+Brussels    6
+Budapest    7
+Copenhagen  8
+Stockolm    9
+Helsinki   10
+Lisbon     11
+London     12
+Madrid     13
+Oslo       14
+Paris      15
+Porto      16
+Rome       17
+Vienna     18
+*/
